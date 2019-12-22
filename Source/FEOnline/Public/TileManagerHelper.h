@@ -4,9 +4,7 @@
 
 #include "CoreMinimal.h"
 
-/**
- * 
- */
+UCLASS(meta=(BlueprintSpawnableComponent))
 class FEONLINE_API TileManagerHelper
 {
 public:
