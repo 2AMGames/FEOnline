@@ -11,10 +11,6 @@
 
 APaperSceneTile::APaperSceneTile()
 {
-	UPaperSpriteComponent* renderComponent = GetRenderComponent();
-	DynamicMaterialInstance = renderComponent->CreateDynamicMaterialInstance(0, MaterialInterfaceObject);
-	renderComponent->SetMaterial(0, DynamicMaterialInstance);
-	SetMaterialColor(ETileType::TT_Open);
 }
 
 void APaperSceneTile::SetTileIndex(int xIndex, int yIndex) {
@@ -30,6 +26,8 @@ void APaperSceneTile::SetMaterialColor(ETileType tileType)
 		return;
 	}
 
+	float scalarValue = .6f;
+
 	switch (tileType)
 	{
 	case ETileType::TT_Blocked:
@@ -38,7 +36,14 @@ void APaperSceneTile::SetMaterialColor(ETileType tileType)
 	case ETileType::TT_Open:
 		DynamicMaterialInstance->SetVectorParameterValue("TileOverlayColor", MovableColor);
 		break;
+	case ETileType::TT_Ignore:
+		scalarValue = 0.0f;
 	}
 
-	DynamicMaterialInstance->SetScalarParameterValue("TileOverlayAlpha", .6f);
+	DynamicMaterialInstance->SetScalarParameterValue("TileOverlayAlpha", scalarValue);
+}
+
+FIntVector APaperSceneTile::GetTileIndex()
+{
+	return TileIndex;
 }

@@ -34,7 +34,7 @@ void UTileManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	// ...
 }
 
-void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY, FVector2D dimensions)
+void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY)
 {
 
 	if (!SceneTileClass)
@@ -50,18 +50,19 @@ void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY, FVector2D d
 	}
 
 	int xDimension = 0;
-	GEngine->AddOnScreenDebugMessage(-1, 5.5f, FColor::Blue, FString::Printf(TEXT("left: %f, right: %f"), bottomLeftX, bottomLeftY));
 	while (xDimension < 10)
 	{
 		int yDimension = 0;
 		while (yDimension < 10)
 		{
-			float xOffset = xDimension * dimensions.X * 9.5;
-			float yOffset = yDimension * dimensions.Y * 9.5;
+			float xOffset = xDimension * TileDimensions.X * 9.5;
+			float yOffset = yDimension * TileDimensions.Y * 9.5;
 
 			FVector placement = FVector(xOffset + bottomLeftX, yOffset + bottomLeftY, 112.0f);
 			FRotator rotation;
 			rotation.Roll = 90.0f;
+			rotation.Pitch = 0.00f;
+			rotation.Yaw = 0.00f;
 
 			FActorSpawnParameters spawnParameters;
 			spawnParameters.Owner = this->GetOwner();

@@ -44,4 +44,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetMaterialColor(ETileType tileType);
+
+	UFUNCTION(BlueprintCallable)
+		FIntVector GetTileIndex();
 };

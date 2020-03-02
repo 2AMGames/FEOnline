@@ -31,12 +31,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
 	TSubclassOf<class APaperSceneTile> SceneTileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	FIntVector TileDimensions;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void CreateTiles(float bottomLeft, float bottomRight, FVector2D dimensions);
+	void CreateTiles(float bottomLeft, float bottomRight);
 		
 private:
 	
