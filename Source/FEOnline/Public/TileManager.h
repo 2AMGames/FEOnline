@@ -40,9 +40,22 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CreateTiles(float bottomLeft, float bottomRight);
+
+	UFUNCTION(BlueprintCallable)
+	void CheckValidTile(APaperSceneTile* currentTile, int movesLeft);
+
+	UFUNCTION(BlueprintCallable)
+	APaperSceneTile* GetTile(const FIntVector& tileIndex);
 		
 private:
 	
 	TArray<APaperSceneTile*> SceneTiles;
 
+	APaperSceneTile* GetTileUp(const FIntVector& tileIndex);
+
+	APaperSceneTile* GetTileDown(const FIntVector& tileIndex);
+
+	APaperSceneTile* GetTileRight(const FIntVector& tileIndex);
+
+	APaperSceneTile* GetTileLeft(const FIntVector& tileIndex);
 };

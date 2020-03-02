@@ -25,7 +25,6 @@ void UTileManager::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UTileManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -84,3 +83,70 @@ void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY)
 	}
 }
 
+void UTileManager::CheckValidTile(APaperSceneTile* currentTile, int movesLeft)
+{
+	if (movesLeft <= 0)
+		return;
+	FIntVector tileIndex = currentTile->GetTileIndex();
+	// TODO Added check for what characters are at the tile, if they are on our team, and can we inhabit that tile simultaneously
+	currentTile->SetMaterialColor(ETileType::TT_Open);
+
+	// Check Upwards
+	if (APaperSceneTile* tileAbove = GetTileUp(tileIndex))
+		CheckValidTile(tileAbove, movesLeft - 1);
+
+	// Check Downwards
+	if (APaperSceneTile* tileBelow = GetTileDown(tileIndex))
+		CheckValidTile(tileBelow, movesLeft - 1);
+
+	// Check Right
+	if (APaperSceneTile* tileRight = GetTileRight(tileIndex))
+		CheckValidTile(tileRight, movesLeft - 1);
+
+	// Check Left
+	if (APaperSceneTile* tileLeft = GetTileLeft(tileIndex))
+		CheckValidTile(tileLeft, movesLeft - 1);
+
+}
+
+APaperSceneTile* UTileManager::GetTile(const FIntVector& tileIndex)
+{
+	int32 index = (TileDimensions.X * tileIndex.X) + tileIndex.Y;
+	if (index >= 0 && index < SceneTiles.Num())
+	{
+		return SceneTiles[index];
+	}
+	return NULL;
+}
+
+APaperSceneTile* UTileManager::GetTileUp(const FIntVector& tileIndex)
+{
+	int32 index = ((tileIndex.X + 1) * TileDimensions.X) + tileIndex.Y;
+	if (index < SceneTiles.Num())
+		return SceneTiles[index];
+	return NULL;
+}
+
+APaperSceneTile* UTileManager::GetTileDown(const FIntVector& tileIndex)
+{
+	int32 index = ((tileIndex.X - 1) * TileDimensions.X) + tileIndex.Y;
+	if (index >= 0 && index < SceneTiles.Num())
+		return SceneTiles[index];
+	return NULL;
+}
+
+APaperSceneTile* UTileManager::GetTileRight(const FIntVector& tileIndex)
+{
+	int32 index = (tileIndex.X * TileDimensions.X) + tileIndex.Y + 1;
+	if (index < SceneTiles.Num())
+		return SceneTiles[index];
+	return NULL;
+}
+
+APaperSceneTile* UTileManager::GetTileLeft(const FIntVector& tileIndex)
+{
+	int32 index = (tileIndex.X * TileDimensions.X) + tileIndex.Y - 1;
+	if (index >= 0 && SceneTiles.Num())
+		return SceneTiles[index];
+	return NULL;
+}
