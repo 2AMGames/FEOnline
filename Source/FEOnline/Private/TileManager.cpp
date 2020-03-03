@@ -83,32 +83,6 @@ void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY)
 	}
 }
 
-void UTileManager::CheckValidTile(APaperSceneTile* currentTile, int movesLeft)
-{
-	if (movesLeft <= 0)
-		return;
-	FIntVector tileIndex = currentTile->GetTileIndex();
-	// TODO Added check for what characters are at the tile, if they are on our team, and can we inhabit that tile simultaneously
-	currentTile->SetMaterialColor(ETileType::TT_Open);
-
-	// Check Upwards
-	if (APaperSceneTile* tileAbove = GetTileUp(tileIndex))
-		CheckValidTile(tileAbove, movesLeft - 1);
-
-	// Check Downwards
-	if (APaperSceneTile* tileBelow = GetTileDown(tileIndex))
-		CheckValidTile(tileBelow, movesLeft - 1);
-
-	// Check Right
-	if (APaperSceneTile* tileRight = GetTileRight(tileIndex))
-		CheckValidTile(tileRight, movesLeft - 1);
-
-	// Check Left
-	if (APaperSceneTile* tileLeft = GetTileLeft(tileIndex))
-		CheckValidTile(tileLeft, movesLeft - 1);
-
-}
-
 APaperSceneTile* UTileManager::GetTile(const FIntVector& tileIndex)
 {
 	int32 index = (TileDimensions.X * tileIndex.X) + tileIndex.Y;
@@ -117,6 +91,59 @@ APaperSceneTile* UTileManager::GetTile(const FIntVector& tileIndex)
 		return SceneTiles[index];
 	}
 	return NULL;
+}
+
+void UTileManager::CheckValidTile(APaperSceneTile* currentTile, int movesLeft)
+{
+	TSet<APaperSceneTile*> sceneTilesVisited;
+	CheckValidTileInternal(sceneTilesVisited, currentTile, movesLeft);
+}
+
+void UTileManager::CheckValidTileInternal(TSet<APaperSceneTile*>& tilesVisited, APaperSceneTile* currentTile, int movesLeft)
+{
+	if (movesLeft < 0)
+		return;
+	tilesVisited.Add(currentTile);
+	FIntVector tileIndex = currentTile->GetTileIndex();
+	// TODO Added check for what characters are at the tile, if they are on our team, and can we inhabit that tile simultaneously
+	currentTile->SetMaterialColor(ETileType::TT_Open);
+
+	// Check Upwards
+	if (APaperSceneTile* tileAbove = GetTileUp(tileIndex))
+	{
+		if (!tilesVisited.Contains(tileAbove))
+		{
+			CheckValidTileInternal(tilesVisited, tileAbove, movesLeft - 1);
+		}
+	}
+
+	// Check Downwards
+	if (APaperSceneTile* tileBelow = GetTileDown(tileIndex))
+	{
+		if (!tilesVisited.Contains(tileBelow))
+		{
+			CheckValidTileInternal(tilesVisited, tileBelow, movesLeft - 1);
+		}
+	}
+
+	// Check Right
+	if (APaperSceneTile* tileRight = GetTileRight(tileIndex))
+	{
+		if (!tilesVisited.Contains(tileRight))
+		{
+			CheckValidTileInternal(tilesVisited, tileRight, movesLeft - 1);
+		}
+	}
+
+	// Check Left
+	if (APaperSceneTile* tileLeft = GetTileLeft(tileIndex))
+	{
+		if (!tilesVisited.Contains(tileLeft))
+		{
+			CheckValidTileInternal(tilesVisited, tileLeft, movesLeft - 1);
+		}
+	}
+	tilesVisited.Remove(currentTile);
 }
 
 APaperSceneTile* UTileManager::GetTileUp(const FIntVector& tileIndex)
@@ -137,7 +164,9 @@ APaperSceneTile* UTileManager::GetTileDown(const FIntVector& tileIndex)
 
 APaperSceneTile* UTileManager::GetTileRight(const FIntVector& tileIndex)
 {
-	int32 index = (tileIndex.X * TileDimensions.X) + tileIndex.Y + 1;
+	if (tileIndex.Y >= TileDimensions.X - 1)
+		return NULL;
+	int32 index = (tileIndex.X * TileDimensions.X) + (tileIndex.Y + 1);
 	if (index < SceneTiles.Num())
 		return SceneTiles[index];
 	return NULL;
@@ -145,7 +174,9 @@ APaperSceneTile* UTileManager::GetTileRight(const FIntVector& tileIndex)
 
 APaperSceneTile* UTileManager::GetTileLeft(const FIntVector& tileIndex)
 {
-	int32 index = (tileIndex.X * TileDimensions.X) + tileIndex.Y - 1;
+	if (tileIndex.Y <= 0)
+		return NULL;
+	int32 index = (tileIndex.X * TileDimensions.X) + (tileIndex.Y - 1);
 	if (index >= 0 && SceneTiles.Num())
 		return SceneTiles[index];
 	return NULL;

@@ -51,6 +51,8 @@ private:
 	
 	TArray<APaperSceneTile*> SceneTiles;
 
+	void CheckValidTileInternal(TSet<APaperSceneTile*>& tilesVisited, APaperSceneTile* currentTile, int movesLeft);
+
 	APaperSceneTile* GetTileUp(const FIntVector& tileIndex);
 
 	APaperSceneTile* GetTileDown(const FIntVector& tileIndex);
