@@ -24,27 +24,27 @@ public:
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		UMaterialInstanceDynamic* DynamicMaterialInstance;
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
-		FLinearColor MovableColor;
+	FLinearColor MovableColor;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
-		FLinearColor NonMovableColor;
+	FLinearColor NonMovableColor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material")
-		UMaterialInterface* MaterialInterfaceObject;
+	UMaterialInterface* MaterialInterfaceObject;
 
 	FIntVector TileIndex;
 	
 public:
 
 	UFUNCTION(BlueprintCallable)
-		void SetTileIndex(int xIndex, int yIndex);
+	void SetTileIndex(int xIndex, int yIndex);
 
 	UFUNCTION(BlueprintCallable)
-		void SetMaterialColor(ETileType tileType);
+	void SetMaterialColor(ETileType tileType);
 
 	UFUNCTION(BlueprintCallable)
-		FIntVector GetTileIndex();
+	FIntVector GetTileIndex();
 };

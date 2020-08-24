@@ -11,6 +11,7 @@
 
 APaperSceneTile::APaperSceneTile()
 {
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void APaperSceneTile::SetTileIndex(int xIndex, int yIndex) {

@@ -22,16 +22,16 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
 	float SpriteSize; 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	AActor* StaticMeshActor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
 	TSubclassOf<class APaperSceneTile> SceneTileClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Configuration")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
 	FIntVector TileDimensions;
 
 public:	
