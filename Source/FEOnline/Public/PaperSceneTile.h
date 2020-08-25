@@ -3,15 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TileManager.h"
 #include "TileType.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "PaperSpriteActor.h"
 #include "PaperSceneTile.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class FEONLINE_API APaperSceneTile : public APaperSpriteActor
 {

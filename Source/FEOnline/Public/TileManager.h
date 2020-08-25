@@ -8,22 +8,36 @@
 #include "TileType.h"
 #include "TileManager.generated.h"
 
+USTRUCT(Blueprintable)
+struct FEONLINE_API FPlaceableSceneTile
+{
+	GENERATED_BODY();
+
+	FPlaceableSceneTile();
+
+	UPROPERTY(EditAnywhere)
+	FVector WorldPosition;
+
+	UPROPERTY(EditAnywhere)
+	ETileType TileType;
+};
+
 
 UCLASS( ClassGroup=(Custom), BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent) )
-class FEONLINE_API UTileManager : public UActorComponent
+class FEONLINE_API ATileManager : public AActor
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UTileManager();
+	ATileManager();
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TArray<FPlaceableSceneTile> PlacedSceneTiles;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
-	float SpriteSize; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	AActor* StaticMeshActor;
@@ -31,15 +45,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
 	TSubclassOf<class APaperSceneTile> SceneTileClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
 	FIntVector TileDimensions;
 
+	UPROPERTY(EditAnywhere)
+	FVector DebugTileDrawSize;
+
+	UPROPERTY(EditAnywhere)
+	FRotator DebugTileRotation;
+
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void Tick(float DeltaTime) override;
+
+	virtual bool ShouldTickIfViewportsOnly() const override { return true; }
 
 	UFUNCTION(BlueprintCallable)
-	void CreateTiles(float bottomLeft, float bottomRight);
+	void CreateTiles(FVector& StartingPosition);
 
 	UFUNCTION(BlueprintCallable)
 	void CheckValidTile(APaperSceneTile* currentTile, int movesLeft);
@@ -49,6 +71,7 @@ public:
 		
 private:
 	
+	UPROPERTY()
 	TArray<APaperSceneTile*> SceneTiles;
 
 	void CheckValidTileInternal(TSet<APaperSceneTile*>& tilesVisited, APaperSceneTile* currentTile, int movesLeft);

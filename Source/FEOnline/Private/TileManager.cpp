@@ -3,37 +3,59 @@
 
 #include "TileManager.h"
 #include "GameFramework/Actor.h"
+#include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 
 // Sets default values for this component's properties
-UTileManager::UTileManager()
+ATileManager::ATileManager()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
-	// ...
+	bool bShouldTick = false;
+#if WITH_EDITOR
+	bShouldTick = true;
+#endif
+	PrimaryActorTick.bCanEverTick = bShouldTick;
 }
 
+FPlaceableSceneTile::FPlaceableSceneTile()
+{
+
+}
 
 // Called when the game starts
-void UTileManager::BeginPlay()
+void ATileManager::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// ...
+#if !WITH_EDITOR
+	if (StaticMeshActor)
+	{
+		FVector Origin;
+		FVector BoxExtent;
+		StaticMeshActor->GetActorBounds(false, Origin, BoxExtent);
+		FVector Position(-BoxExtent.X - BoxExtent.Y, -BoxExtent.Y, Origin.Z);
+		//CreateTiles(Position);
+	}
 	
+#endif
 }
 
-// Called every frame
-void UTileManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void ATileManager::Tick(float DeltaTime)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::Tick(DeltaTime);
 
-	// ...
+#if WITH_EDITOR
+
+	for (FPlaceableSceneTile& PlacedSceneTile : PlacedSceneTiles)
+	{
+		DrawDebugBox(GetWorld(), PlacedSceneTile.WorldPosition, DebugTileDrawSize, FQuat(DebugTileRotation), FColor::Blue, false, -1.0f, 0.f);
+	}
+
+#endif
 }
 
-void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY)
+void ATileManager::CreateTiles(FVector& StartingPosition)
 {
 
 	if (!SceneTileClass)
@@ -48,42 +70,9 @@ void UTileManager::CreateTiles(float bottomLeftX, float bottomLeftY)
 		return;
 	}
 
-	int xDimension = 0;
-	while (xDimension < 10)
-	{
-		int yDimension = 0;
-		while (yDimension < 10)
-		{
-			float xOffset = xDimension * TileDimensions.X * 9.5;
-			float yOffset = yDimension * TileDimensions.Y * 9.5;
-
-			FVector placement = FVector(xOffset + bottomLeftX, yOffset + bottomLeftY, 112.0f);
-			FRotator rotation;
-			rotation.Roll = 90.0f;
-			rotation.Pitch = 0.00f;
-			rotation.Yaw = 0.00f;
-
-			FActorSpawnParameters spawnParameters;
-			spawnParameters.Owner = this->GetOwner();
-
-			FAttachmentTransformRules rules(EAttachmentRule::KeepWorld, false);
-
-			FTransform tileTransform;
-			tileTransform.SetLocation(placement);
-			tileTransform.SetRotation(rotation.Quaternion());
-
-			APaperSceneTile* sceneTile = GetWorld()->SpawnActor<APaperSceneTile>(SceneTileClass, tileTransform, spawnParameters);
-			sceneTile->SetOwner(GetOwner());
-			sceneTile->AttachToActor(GetOwner(), rules);
-			sceneTile->SetTileIndex(xDimension, yDimension);
-			SceneTiles.Add(sceneTile);
-			++yDimension;
-		}
-		++xDimension;
-	}
 }
 
-APaperSceneTile* UTileManager::GetTile(const FIntVector& tileIndex)
+APaperSceneTile* ATileManager::GetTile(const FIntVector& tileIndex)
 {
 	int32 index = (TileDimensions.X * tileIndex.X) + tileIndex.Y;
 	if (index >= 0 && index < SceneTiles.Num())
@@ -93,13 +82,13 @@ APaperSceneTile* UTileManager::GetTile(const FIntVector& tileIndex)
 	return NULL;
 }
 
-void UTileManager::CheckValidTile(APaperSceneTile* currentTile, int movesLeft)
+void ATileManager::CheckValidTile(APaperSceneTile* currentTile, int movesLeft)
 {
 	TSet<APaperSceneTile*> sceneTilesVisited;
 	CheckValidTileInternal(sceneTilesVisited, currentTile, movesLeft);
 }
 
-void UTileManager::CheckValidTileInternal(TSet<APaperSceneTile*>& tilesVisited, APaperSceneTile* currentTile, int movesLeft)
+void ATileManager::CheckValidTileInternal(TSet<APaperSceneTile*>& tilesVisited, APaperSceneTile* currentTile, int movesLeft)
 {
 	if (movesLeft < 0)
 		return;
@@ -146,7 +135,7 @@ void UTileManager::CheckValidTileInternal(TSet<APaperSceneTile*>& tilesVisited, 
 	tilesVisited.Remove(currentTile);
 }
 
-APaperSceneTile* UTileManager::GetTileUp(const FIntVector& tileIndex)
+APaperSceneTile* ATileManager::GetTileUp(const FIntVector& tileIndex)
 {
 	int32 index = ((tileIndex.X + 1) * TileDimensions.X) + tileIndex.Y;
 	if (index < SceneTiles.Num())
@@ -154,7 +143,7 @@ APaperSceneTile* UTileManager::GetTileUp(const FIntVector& tileIndex)
 	return NULL;
 }
 
-APaperSceneTile* UTileManager::GetTileDown(const FIntVector& tileIndex)
+APaperSceneTile* ATileManager::GetTileDown(const FIntVector& tileIndex)
 {
 	int32 index = ((tileIndex.X - 1) * TileDimensions.X) + tileIndex.Y;
 	if (index >= 0 && index < SceneTiles.Num())
@@ -162,7 +151,7 @@ APaperSceneTile* UTileManager::GetTileDown(const FIntVector& tileIndex)
 	return NULL;
 }
 
-APaperSceneTile* UTileManager::GetTileRight(const FIntVector& tileIndex)
+APaperSceneTile* ATileManager::GetTileRight(const FIntVector& tileIndex)
 {
 	if (tileIndex.Y >= TileDimensions.X - 1)
 		return NULL;
@@ -172,7 +161,7 @@ APaperSceneTile* UTileManager::GetTileRight(const FIntVector& tileIndex)
 	return NULL;
 }
 
-APaperSceneTile* UTileManager::GetTileLeft(const FIntVector& tileIndex)
+APaperSceneTile* ATileManager::GetTileLeft(const FIntVector& tileIndex)
 {
 	if (tileIndex.Y <= 0)
 		return NULL;
